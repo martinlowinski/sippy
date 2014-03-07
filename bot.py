@@ -137,10 +137,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
         #                      mtype='groupchat')
         if msg['mucnick'] != self.nick:
           global msgCnt
-          print("Message: %s" % msg['body'])
           condition.acquire()
           msgCnt += 1
-          print "Produced", msgCnt
           condition.notify()
           condition.release()
         if msg['mucnick'] != self.nick and '!uptime' in msg['body']:
@@ -178,7 +176,6 @@ class ConsumerThread(Thread):
             condition.acquire()
             num = msgCnt
             rrd_update('example.rrd', 'N:%s' % num);
-            print "Consumed", num
             msgCnt = 0
             condition.notify()
             condition.release()
