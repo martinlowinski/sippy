@@ -1,4 +1,4 @@
 sippy
 =====
 
-Jabber/XMPP bot written in Python
+Jabber/XMPP bot that tracks activities in group chats via the rrdtool.
