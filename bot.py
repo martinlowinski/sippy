@@ -154,6 +154,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
             self.send_message(mto=msg['from'].bare,
                               mbody="You silly, get to work!",
                               mtype='groupchat')
+        if msg['mucnick'] != self.nick and '!stats' in msg['body']:
+            self.send_stats(msg)
 
     def muc_online(self, presence):
         """
@@ -173,6 +175,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
                                                       presence['muc']['nick']),
                               mtype='groupchat')
 
+    def send_stats(self, msg):
+        body = METRICS_URL % 'daily'
+        self.send_message(mto=msg['from'].bare,
+                          mbody=body,
+                          mtype='groupchat')
 
 class StatsThread(Thread):
     def run(self):
