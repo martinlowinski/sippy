@@ -32,6 +32,11 @@ if sys.version_info < (3, 0):
 else:
     raw_input = input
 
+# Configuration
+METRICS_URL="http://example.com/metrics-%s.png"
+PATH_TO_METRICS="/path/to/metrics/metrics-%s.png"
+PATH_TO_RRD_DB="/path/to/example.rrd"
+
 msgCnt = 0
 condition = Condition()
 
@@ -103,7 +108,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
                                         # If a room password is needed, use:
                                         # password=the_room_password,
                                         wait=True)
-        ConsumerThread().start()
+        StatsThread().start()
 
     def muc_message(self, msg):
         """
@@ -169,16 +174,17 @@ class MUCBot(sleekxmpp.ClientXMPP):
                               mtype='groupchat')
 
 
-class ConsumerThread(Thread):
+class StatsThread(Thread):
     def run(self):
         global msgCnt
         while True:
             condition.acquire()
             num = msgCnt
-            rrd_update('example.rrd', 'N:%s' % num);
+            rrd_update(PATH_TO_RRD_DB, 'N:%s' % num);
             msgCnt = 0
             condition.notify()
             condition.release()
+            self.run_stats()
             time.sleep(600)
 
 
