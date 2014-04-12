@@ -187,6 +187,26 @@ class StatsThread(Thread):
             self.run_stats()
             time.sleep(600)
 
+    def run_stats(self):
+        for sched in ['hourly', 'daily' , 'weekly', 'monthly']:
+            if sched == 'hourly':
+                period = 'h'
+            if sched == 'weekly':
+                period = 'w'
+            elif sched == 'daily':
+                period = 'd'
+            elif sched == 'monthly':
+                period = 'm'
+            ret = rrdtool.graph( PATH_TO_METRICS %(sched), "--start", "-1%s" %(period), "--vertical-label=Num",
+                 '--watermark=bot',
+                 "-w 800",
+                 "DEF:m1_num=" + PATH_TO_RRD_DB + ":msg:AVERAGE",
+                 "VDEF:m1_avg=m1_num,AVERAGE",
+                 "LINE2:m1_avg",
+                 "LINE1:m1_num#0000FF:msg\\r",
+                 "GPRINT:m1_num:AVERAGE:Avg m1\: %6.0lf ",
+                 "GPRINT:m1_num:MAX:Max m1\: %6.0lf \\r")
+
 
 if __name__ == '__main__':
     # Setup the command line arguments.
